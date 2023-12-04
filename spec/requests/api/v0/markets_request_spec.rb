@@ -18,6 +18,7 @@ describe "Markets API" do
 
       expect(market).to have_key(:type)
       expect(market[:type]).to be_a(String)
+      expect(market[:type]).to eq("market")
      
       expect(market).to have_key(:attributes)
       expect(market[:attributes]).to be_an(Hash)
@@ -45,7 +46,9 @@ describe "Markets API" do
 
       expect(market[:attributes]).to have_key(:lon)
       expect(market[:attributes][:lon]).to be_a(String)
-        
+       
+      expect(market[:attributes]).to have_key(:vendor_count)
+      expect(market[:attributes][:vendor_count]).to be_a(Integer)
     end
   end
 end
