@@ -9,7 +9,7 @@ describe "Vendor API Request" do
 
     expect(response).to be_successful
 
-    vendor = JSON.parse(response.body, symbolize_names: true)
+    vendor = JSON.parse(response.body, symbolize_names: true)[:data]
 
     # expect(vendor).to have_key(:id)
     # expect(vendor[:id]).to eq(id)
