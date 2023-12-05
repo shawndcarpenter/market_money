@@ -98,7 +98,7 @@ describe "Markets API" do
 
   describe "sad paths" do
     it "will gracefully handle if a market id doesn't exist" do
-      get "/api/v0/markets/1"
+      get "/api/v0/markets/123123123123"
 
       expect(response).to_not be_successful
       expect(response.status).to eq(404)
@@ -107,7 +107,7 @@ describe "Markets API" do
 
       expect(data[:errors]).to be_a(Array)
       expect(data[:errors].first[:status]).to eq("404")
-      expect(data[:errors].first[:title]).to eq("Couldn't find Market with 'id'=1")
+      expect(data[:errors].first[:title]).to eq("Couldn't find Market with 'id'=123123123123")
     end
   end
 end
