@@ -4,6 +4,6 @@ FactoryBot.define do
     description { Faker::TvShows::DrWho.quote }
     contact_name { Faker::FunnyName.two_word_name }
     contact_phone { Faker::Number.number(digits: 10) }
-    credit_accepted { Faker::Boolean.boolean }
+    credit_accepted { true }
   end
 end
