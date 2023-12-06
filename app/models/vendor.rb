@@ -5,5 +5,11 @@ class Vendor < ApplicationRecord
   validates_presence_of :description
   validates_presence_of :contact_name
   validates_presence_of :contact_phone
-  validates_presence_of :credit_accepted
+  validate :does_not_have_a_boolean
+
+  def does_not_have_a_boolean
+    if credit_accepted != true && credit_accepted != false
+      errors.add(:credit_accepted, "can't be blank")
+    end
+  end
 end
