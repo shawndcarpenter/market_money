@@ -13,6 +13,16 @@ class Api::V0::MarketVendorsController < ApplicationController
     end
   end
 
+  def destroy
+    market = Market.find(params["market_vendor"][:market_id])
+    vendor = Vendor.find(params["market_vendor"][:vendor_id])
+    market_vendor = MarketVendor.where(market_id: market.id).where(vendor_id: vendor.id)
+    # binding.pry
+    if market_vendor
+      render json: MarketVendor.delete(market_vendor.first.id), status: 204
+    end
+  end
+
   private
   def market_vendor_params
     params.permit(:market_id, :vendor_id)
