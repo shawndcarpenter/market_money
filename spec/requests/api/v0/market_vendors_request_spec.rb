@@ -93,12 +93,35 @@ describe "Market Vendors" do
       post "/api/v0/market_vendors", headers: headers, params: JSON.generate(market_vendor: market_vendor_params)
       
       expect(MarketVendor.all.length).to eq(6)
-      
+
       delete "/api/v0/market_vendors", headers: headers, params: JSON.generate(market_vendor_params)
       
       expect(response).to be_successful
       expect(response.status).to eq(204)
       expect(MarketVendor.all.length).to eq(5)
+    end
+
+    describe "destroy sad paths" do
+      it "must have a valid market and valid vendor id" do
+        market = create(:market)
+        market.vendors = create_list(:vendor, 5)
+
+        body = {
+          market_id: 4233, 
+          vendor_id: 11520 
+        }
+        headers = {"CONTENT_TYPE" => "application/json"}
+        delete "/api/v0/market_vendors", headers: headers, params: JSON.generate(body)
+
+        expect(response).to_not be_successful
+        expect(response.status).to eq(404)
+        expect(MarketVendor.all.length).to eq(5)
+
+        data = JSON.parse(response.body, symbolize_names: true)
+
+        expect(data[:errors]).to be_a(Array)
+        expect(data[:errors].first[:detail]).to eq("No MarketVendor with market_id=4233 AND vendor_id=11520 exists")
+      end
     end
   end
 end
