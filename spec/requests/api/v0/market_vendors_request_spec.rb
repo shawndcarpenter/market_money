@@ -70,12 +70,35 @@ describe "Market Vendors" do
       headers = {"CONTENT_TYPE" => "application/json"}
       post "/api/v0/market_vendors", headers: headers, params: JSON.generate(market_vendor: market_vendor_params)
       expect(response).to be_successful
+      expect(MarketVendor.all.length).to eq(1)
       
       data = JSON.parse(response.body, symbolize_names: true)
-      # binding.pry
   
-      expect(data[:message]).to eq("Successfully added vendor to market")
+      expect(data[:message]).to eq("Successfully added vendor to market")  
+    end
+  end
+
+  describe "delete market vendors" do
+    it "destroy an existing association between a market and a vendor" do
+      market = create(:market)
+      market.vendors = create_list(:vendor, 5)
+      vendor = create(:vendor)
+
+      expect(market.vendors).to_not include(vendor)
+      market_vendor_params =  {
+        market_id: market.id,
+        vendor_id: vendor.id
+      }
+      headers = {"CONTENT_TYPE" => "application/json"}
+      post "/api/v0/market_vendors", headers: headers, params: JSON.generate(market_vendor: market_vendor_params)
       
+      expect(MarketVendor.all.length).to eq(6)
+      
+      delete "/api/v0/market_vendors", headers: headers, params: JSON.generate(market_vendor_params)
+      
+      expect(response).to be_successful
+      expect(response.status).to eq(204)
+      expect(MarketVendor.all.length).to eq(5)
     end
   end
 end
