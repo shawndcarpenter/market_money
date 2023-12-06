@@ -13,8 +13,8 @@ describe "Markets API" do
     expect(markets.count).to eq(5)
 
     markets.each do |market|
-      # expect(market).to have_key(:id)
-      # expect(market[:id]).to eq(id)
+      expect(market).to have_key(:id)
+      expect(market[:id].to_i)
 
       expect(market).to have_key(:type)
       expect(market[:type]).to be_a(String)

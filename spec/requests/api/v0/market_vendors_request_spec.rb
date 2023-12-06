@@ -15,8 +15,8 @@ describe "Market Vendors" do
     expect(vendors[:data].count).to eq(5)
 
     vendors[:data].each do |vendor|
-      # expect(vendor).to have_key(:id)
-      # expect(vendor[:id]).to eq(id)
+      expect(vendor).to have_key(:id)
+      expect(vendor[:id].to_i).to be_a(Integer)
 
       expect(vendor).to have_key(:type)
       expect(vendor[:type]).to be_a(String)
@@ -53,6 +53,28 @@ describe "Market Vendors" do
 
       expect(data[:errors]).to be_a(Array)
       expect(data[:errors].first[:detail]).to eq("Couldn't find Market with 'id'=123123123123")
+    end
+  end
+
+  describe "create market vendors" do
+    it "can create a new relationship between a market and a vendor" do 
+      market_1 = create(:market)
+      vendor = create(:vendor)
+
+      expect(market_1.vendors).to_not include(vendor)
+      market_vendor_params =  ({
+        market_id: market_1.id,
+        vendor_id: vendor.id
+      })
+      
+      post "/api/v0/market_vendors", headers: headers, params: JSON.generate(market_vendor: market_vendor_params)
+      
+      expect(response).to be_successful
+
+      data = JSON.parse(response.body, symbolize_names: true)
+  
+      expect(data[:message]).to eq("Successfully added vendor to market")
+      
     end
   end
 end
