@@ -1,5 +1,5 @@
 class Api::V0::MarketVendorsController < ApplicationController
-  rescue_from ActiveRecord::RecordNotFound, with: :not_found_response
+  # rescue_from ActiveRecord::RecordNotFound, with: :not_found_response
   rescue_from ActiveRecord::RecordInvalid, with: :invalid_response
 
   def create
@@ -14,12 +14,20 @@ class Api::V0::MarketVendorsController < ApplicationController
   end
 
   def destroy
-    market = Market.find(params["market_vendor"][:market_id])
-    vendor = Vendor.find(params["market_vendor"][:vendor_id])
-    market_vendor = MarketVendor.where(market_id: market.id).where(vendor_id: vendor.id)
+    # market = Market.find(params["market_vendor"][:market_id])
     # binding.pry
-    if market_vendor
-      render json: MarketVendor.delete(market_vendor.first.id), status: 204
+    @params_market_id = params["market_vendor"][:market_id]
+    @params_vendor_id = params["market_vendor"][:vendor_id]
+    # vendor = Vendor.find(params["market_vendor"][:vendor_id])
+    market_vendor = MarketVendor.where(market_id: @params_market_id).where(vendor_id: @params_vendor_id).first
+    # binding.pry
+    if market_vendor != nil
+      render json: MarketVendor.delete(market_vendor.id), status: 204
+    else
+      render json:  {
+                "errors": [{
+                "detail": "No MarketVendor with market_id=#{@params_market_id} AND vendor_id=#{@params_vendor_id} exists"
+                }]}, status: 404
     end
   end
 
