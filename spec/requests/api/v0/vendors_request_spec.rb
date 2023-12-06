@@ -103,7 +103,7 @@ describe "Vendor API Request" do
         vendor_params = ({
           name: "Buzzy Bees",
           description: "local honey and wax products",
-          credit_accepted: true
+          credit_accepted: false
       })
       headers = {"CONTENT_TYPE" => "application/json"}
   
@@ -117,6 +117,37 @@ describe "Vendor API Request" do
       expect(data[:errors]).to be_a(Array)
       expect(data[:errors].first[:detail]).to eq("Validation failed: Contact name can't be blank, Contact phone can't be blank")
       end
+    end
+  end
+
+  describe "vendor update" do
+    it "can update an existing vendor" do
+      vendor_params = ({
+        name: "Buzzy Bees",
+        description: "local honey and wax products",
+        contact_name: "Berly Couwer",
+        contact_phone: "8389928383",
+        credit_accepted: true
+    })
+    headers = {"CONTENT_TYPE" => "application/json"}
+
+    post "/api/v0/vendors", headers: headers, params: JSON.generate(vendor: vendor_params)
+    vendor = Vendor.last
+    previous_name = vendor.contact_name
+    previous_credit_accepted = vendor.credit_accepted
+    new_vendor_params = {
+      contact_name: "Kimberly Couwer",
+      credit_accepted: false
+      }
+
+    patch "/api/v0/vendors/#{vendor.id}",  
+      headers: headers, params: JSON.generate({vendor: new_vendor_params})
+    vendor = Vendor.last
+
+    expect(response).to be_successful
+    expect(vendor.contact_name).to_not eq("Berly Couwer")
+    expect(vendor.contact_name).to eq("Kimberly Couwer")
+    expect(vendor.credit_accepted).to eq(false)
     end
   end
 end
