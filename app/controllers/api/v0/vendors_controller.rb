@@ -25,7 +25,6 @@ class Api::V0::VendorsController < ApplicationController
   def update
     if vendor_params[:contact_name] == ""
       vendor = Vendor.find(params[:id])
-      # binding.pry
       vendor.update!(contact_name: nil)
       render json: VendorSerializer.new(Vendor.update(params[:id], vendor_params))
     else

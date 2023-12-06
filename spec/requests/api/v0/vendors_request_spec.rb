@@ -154,7 +154,7 @@ describe "Vendor API Request" do
           contact_name: "",
           credit_accepted: false
         })
-        # binding.pry
+ 
         expect(response).to_not be_successful
         expect(response.status).to eq(400)
 
