@@ -21,6 +21,13 @@ class Api::V0::VendorsController < ApplicationController
     render json: VendorSerializer.new(Vendor.update(params[:id], vendor_params)) unless vendor_params[:contact_name] == ""
   end
 
+  def destroy 
+    vendor = Vendor.find(params[:id])
+    if vendor
+      render json: Vendor.delete(params[:id])
+    end
+  end
+
   private
   def not_found_response(exception)
     render json: ErrorSerializer.new(ErrorMessage.new(exception.message, 404))
