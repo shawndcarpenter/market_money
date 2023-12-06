@@ -185,4 +185,33 @@ describe "Vendor API Request" do
       end
     end
   end
+
+  describe "vendor delete" do
+    it "can delete a vendor" do
+      vendor = create(:vendor)
+
+      expect(Vendor.count).to eq(1)
+
+      delete "/api/v0/vendors/#{vendor.id}"
+
+      expect(response).to be_successful
+      expect(response.status).to eq(200)
+      expect(Vendor.count).to eq(0)
+      expect{Vendor.find(vendor.id)}.to raise_error(ActiveRecord::RecordNotFound)
+    end
+
+    describe "vendor delete sad paths" do
+      it "gives an error when vendor id is invalid" do
+        delete "/api/v0/vendors/123123123123"
+
+        expect(response).to_not be_successful
+        expect(response.status).to eq(404)
+
+        data = JSON.parse(response.body, symbolize_names: true)
+
+        expect(data[:errors]).to be_an(Array)
+        expect(data[:errors].first[:detail]).to eq("Couldn't find Vendor with 'id'=123123123123")
+      end
+    end
+  end
 end
