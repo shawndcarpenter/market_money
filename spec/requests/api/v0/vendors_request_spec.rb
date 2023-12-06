@@ -8,6 +8,7 @@ describe "Vendor API Request" do
     get "/api/v0/vendors/#{id}"
 
     expect(response).to be_successful
+    expect(response.status).to eq(200)
 
     vendor = JSON.parse(response.body, symbolize_names: true)[:data]
 
@@ -66,7 +67,7 @@ describe "Vendor API Request" do
     vendor = Vendor.last
 
     expect(response).to be_successful
-    # expect(response.status).to eq(201)
+    expect(response.status).to eq(201)
     
     expect(vendor.name).to eq(vendor_params[:name])
     expect(vendor.description).to eq(vendor_params[:description])
@@ -86,9 +87,9 @@ describe "Vendor API Request" do
       headers = {"CONTENT_TYPE" => "application/json"}
   
       post "/api/v0/vendors", headers: headers, params: JSON.generate(vendor: vendor_params)
-  
       expect(response).to_not be_successful
-      expect(response.status).to eq(404)
+      # binding.pry
+      expect(response.status).to eq(400)
 
       data = JSON.parse(response.body, symbolize_names: true)
 
@@ -124,6 +125,7 @@ describe "Vendor API Request" do
       vendor = Vendor.last
 
       expect(response).to be_successful
+      expect(response.status).to eq(200)
       expect(vendor.contact_name).to_not eq("Berly Couwer")
       expect(vendor.contact_name).to eq("Kimberly Couwer")
       expect(vendor.credit_accepted).to eq(false)
@@ -146,13 +148,13 @@ describe "Vendor API Request" do
         expect(data[:errors].first[:detail]).to eq("Couldn't find Vendor with 'id'=123123123123")
       end
 
-      xit "gives an error when an update parameter is blank" do
+      it "gives an error when an update parameter is blank" do
         patch "/api/v0/vendors/#{@vendor.id}",
         headers: headers, params: JSON.generate( {
           contact_name: "",
           credit_accepted: false
         })
-
+        # binding.pry
         expect(response).to_not be_successful
         expect(response.status).to eq(400)
 
@@ -173,7 +175,7 @@ describe "Vendor API Request" do
       delete "/api/v0/vendors/#{vendor.id}"
 
       expect(response).to be_successful
-      expect(response.status).to eq(200)
+      expect(response.status).to eq(204)
       expect(Vendor.count).to eq(0)
       expect{Vendor.find(vendor.id)}.to raise_error(ActiveRecord::RecordNotFound)
     end

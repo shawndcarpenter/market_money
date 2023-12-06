@@ -7,6 +7,7 @@ describe "Markets API" do
     get '/api/v0/markets'
 
     expect(response).to be_successful
+    expect(response.status).to eq(200)
 
     markets = JSON.parse(response.body, symbolize_names: true)[:data]
     # binding.pry
@@ -60,7 +61,8 @@ describe "Markets API" do
     market = JSON.parse(response.body, symbolize_names: true)[:data]
 
     expect(response).to be_successful
-
+    expect(response.status).to eq(200)
+    
     expect(market).to have_key(:type)
     expect(market[:type]).to be_a(String)
     expect(market[:type]).to eq("market")

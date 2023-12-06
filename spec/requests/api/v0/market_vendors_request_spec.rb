@@ -9,6 +9,7 @@ describe "Market Vendors" do
     get "/api/v0/markets/#{id}/vendors"
 
     expect(response).to be_successful
+    expect(response.status).to eq(200)
 
     vendors = JSON.parse(response.body, symbolize_names: true)
 
@@ -58,20 +59,20 @@ describe "Market Vendors" do
 
   describe "create market vendors" do
     it "can create a new relationship between a market and a vendor" do 
-      market_1 = create(:market)
+      market = create(:market)
       vendor = create(:vendor)
 
-      expect(market_1.vendors).to_not include(vendor)
-      market_vendor_params =  ({
-        market_id: market_1.id,
+      expect(market.vendors).to_not include(vendor)
+      market_vendor_params =  {
+        market_id: market.id,
         vendor_id: vendor.id
-      })
-      
+      }
+      headers = {"CONTENT_TYPE" => "application/json"}
       post "/api/v0/market_vendors", headers: headers, params: JSON.generate(market_vendor: market_vendor_params)
-      
       expect(response).to be_successful
-
+      
       data = JSON.parse(response.body, symbolize_names: true)
+      # binding.pry
   
       expect(data[:message]).to eq("Successfully added vendor to market")
       
