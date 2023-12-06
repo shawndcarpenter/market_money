@@ -121,33 +121,68 @@ describe "Vendor API Request" do
   end
 
   describe "vendor update" do
-    it "can update an existing vendor" do
+    before :each do
       vendor_params = ({
         name: "Buzzy Bees",
         description: "local honey and wax products",
         contact_name: "Berly Couwer",
         contact_phone: "8389928383",
         credit_accepted: true
-    })
-    headers = {"CONTENT_TYPE" => "application/json"}
+      })
+      headers = {"CONTENT_TYPE" => "application/json"}
+  
+      post "/api/v0/vendors", headers: headers, params: JSON.generate(vendor: vendor_params)
+      @vendor = Vendor.last
+    end
 
-    post "/api/v0/vendors", headers: headers, params: JSON.generate(vendor: vendor_params)
-    vendor = Vendor.last
-    previous_name = vendor.contact_name
-    previous_credit_accepted = vendor.credit_accepted
-    new_vendor_params = {
-      contact_name: "Kimberly Couwer",
-      credit_accepted: false
-      }
+    it "can update an existing vendor" do
+      new_vendor_params = {
+        contact_name: "Kimberly Couwer",
+        credit_accepted: false
+        }
 
-    patch "/api/v0/vendors/#{vendor.id}",  
-      headers: headers, params: JSON.generate({vendor: new_vendor_params})
-    vendor = Vendor.last
+      patch "/api/v0/vendors/#{@vendor.id}",  
+        headers: headers, params: JSON.generate({vendor: new_vendor_params})
+      vendor = Vendor.last
 
-    expect(response).to be_successful
-    expect(vendor.contact_name).to_not eq("Berly Couwer")
-    expect(vendor.contact_name).to eq("Kimberly Couwer")
-    expect(vendor.credit_accepted).to eq(false)
+      expect(response).to be_successful
+      expect(vendor.contact_name).to_not eq("Berly Couwer")
+      expect(vendor.contact_name).to eq("Kimberly Couwer")
+      expect(vendor.credit_accepted).to eq(false)
+    end
+
+    describe "vendor update sad paths" do
+      it "gives an error when vendor id is invalid" do
+        patch "/api/v0/vendors/123123123123",
+        headers: headers, params: JSON.generate( {
+          "contact_name": "Kimberly Couwer",
+          "credit_accepted": false
+        })
+
+        expect(response).to_not be_successful
+        expect(response.status).to eq(404)
+
+        data = JSON.parse(response.body, symbolize_names: true)
+
+        expect(data[:errors]).to be_an(Array)
+        expect(data[:errors].first[:detail]).to eq("Couldn't find Vendor with 'id'=123123123123")
+      end
+
+      xit "gives an error when an update parameter is blank" do
+        patch "/api/v0/vendors/#{@vendor.id}",
+        headers: headers, params: JSON.generate( {
+          contact_name: "",
+          credit_accepted: false
+        })
+
+        expect(response).to_not be_successful
+        expect(response.status).to eq(400)
+
+        data = JSON.parse(response.body, symbolize_names: true)
+
+        expect(data[:errors]).to be_an(Array)
+        expect(data[:errors].first[:detail]).to eq("Validation failed: Contact name can't be blank")
+      end
     end
   end
 end

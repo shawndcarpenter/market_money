@@ -2,6 +2,7 @@ class Api::V0::VendorsController < ApplicationController
   rescue_from ActiveRecord::RecordNotFound, with: :not_found_response
   rescue_from ActiveRecord::RecordInvalid, with: :invalid_response
 
+
   def index
     market = Market.find(params[:market_id])
     vendors = market.vendors
@@ -17,7 +18,7 @@ class Api::V0::VendorsController < ApplicationController
   end
 
   def update
-    render json: VendorSerializer.new(Vendor.update(params[:id], vendor_params))
+    render json: VendorSerializer.new(Vendor.update(params[:id], vendor_params)) unless vendor_params[:contact_name] == ""
   end
 
   private
