@@ -104,23 +104,26 @@ describe "Market Vendors" do
     describe "destroy sad paths" do
       it "must have a valid market and valid vendor id" do
         market = create(:market)
+        market2 = create(:market)
         market.vendors = create_list(:vendor, 5)
+        market2.vendors = create_list(:vendor, 2)
+        vendor = market2.vendors.first
 
         body = {
-          market_id: 4233, 
-          vendor_id: 11520 
+          market_id: market.id, 
+          vendor_id: vendor.id 
         }
         headers = {"CONTENT_TYPE" => "application/json"}
         delete "/api/v0/market_vendors", headers: headers, params: JSON.generate(body)
 
         expect(response).to_not be_successful
         expect(response.status).to eq(404)
-        expect(MarketVendor.all.length).to eq(5)
+        expect(MarketVendor.all.length).to eq(7)
 
         data = JSON.parse(response.body, symbolize_names: true)
 
         expect(data[:errors]).to be_a(Array)
-        expect(data[:errors].first[:detail]).to eq("No MarketVendor with market_id=4233 AND vendor_id=11520 exists")
+        expect(data[:errors].first[:detail]).to eq("No MarketVendor with market_id=#{market.id} AND vendor_id=#{vendor.id} exists")
       end
     end
   end
