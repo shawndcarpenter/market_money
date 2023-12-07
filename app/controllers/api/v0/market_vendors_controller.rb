@@ -1,6 +1,5 @@
 class Api::V0::MarketVendorsController < ApplicationController
   rescue_from ActiveRecord::RecordInvalid, with: :invalid_response
-  
 
   def create
     market = Market.find(params["market_vendor"][:market_id])
