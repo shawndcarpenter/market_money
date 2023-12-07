@@ -112,7 +112,16 @@ describe "Market Search" do
     expect(market[:attributes][:lat]).to eq(@market1.lat)
     expect(market[:attributes][:lon]).to eq(@market1.lon)
     expect(market[:attributes][:vendor_count]).to eq(5)
+  end
+
+  it "will return an empty array if no markets are found with valid search terms" do
+    get "/api/v0/markets/search?state=thisisnotarealstate" 
     
+    expect(response).to be_successful
+    expect(response.status).to eq(200)
+
+    markets = JSON.parse(response.body, symbolize_names: true)[:data]
+    expect(markets).to eq([])
   end
 
   describe "sad paths" do
