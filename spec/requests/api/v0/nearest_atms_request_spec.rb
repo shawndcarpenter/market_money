@@ -57,4 +57,18 @@ describe "Nearest ATMs" do
       expect(atm[:attributes][:distance]).to be_a(Float)
     end
   end
+
+  describe "sad path, invalid market id" do
+    it "will generate an error message if market id is invalid" do
+      get "/api/v0/markets/123123123123/nearest_atms", headers: headers
+
+      expect(response).to_not be_successful
+      expect(response.status).to eq(404)
+
+      data = JSON.parse(response.body, symbolize_names: true)
+
+      expect(data[:errors]).to be_an(Array)
+      expect(data[:errors].first[:detail]).to eq("Couldn't find Market with 'id'=123123123123")
+    end
+  end
 end
