@@ -10,15 +10,13 @@ describe "Market Search" do
   end
 
   it "searches for markets in a state and city" do
-    # body =  { state: @market1.state, city: @market1.city }
     get "/api/v0/markets/search?city=#{@market1.city}&state=#{@market1.state}" 
-    # headers: {"CONTENT_TYPE" => "application/json"}, params: JSON.generate(body)
 
     expect(response).to be_successful
     expect(response.status).to eq(200)
-    markets = JSON.parse(response.body, symbolize_names: true)[:data]
-    # binding.pry
+
     market = JSON.parse(response.body, symbolize_names: true)[:data].first
+    
     expect(market[:id].to_i).to eq(@market1.id)
     expect(market[:type]).to eq("market")
     expect(market[:attributes][:name]).to eq(@market1.name)
@@ -33,14 +31,13 @@ describe "Market Search" do
   end
 
   it "searches for markets in a state, city and with a name" do
-    # body =  { state: @market1.state, city: @market1.city, name: @market1.name }
     get "/api/v0/markets/search?city=#{@market1.city}&state=#{@market1.state}&name=#{@market1.name}" 
-    # headers: @headers, params: JSON.generate(body)
 
     expect(response).to be_successful
     expect(response.status).to eq(200)
 
     market = JSON.parse(response.body, symbolize_names: true)[:data].first
+    
     expect(market[:id].to_i).to eq(@market1.id)
     expect(market[:type]).to eq("market")
     expect(market[:attributes][:name]).to eq(@market1.name)
@@ -55,14 +52,13 @@ describe "Market Search" do
   end
 
   it "searches for markets in a state with a name" do
-    # body =  { state: @market1.state, name: @market1.name }
     get "/api/v0/markets/search?state=#{@market1.state}&name=#{@market1.name}" 
-    # headers: @headers, params: JSON.generate(body)
-
+    
     expect(response).to be_successful
     expect(response.status).to eq(200)
 
     market = JSON.parse(response.body, symbolize_names: true)[:data].first
+    
     expect(market[:id].to_i).to eq(@market1.id)
     expect(market[:type]).to eq("market")
     expect(market[:attributes][:name]).to eq(@market1.name)
@@ -77,14 +73,13 @@ describe "Market Search" do
   end
 
   it "searches for markets in a state" do
-    # body =  { name: "Bee's Knees" }
     get "/api/v0/markets/search?name=#{@market1.name}" 
-    # headers: @headers, params: JSON.generate(body)
-
+    
     expect(response).to be_successful
     expect(response.status).to eq(200)
 
     market = JSON.parse(response.body, symbolize_names: true)[:data].first
+    
     expect(market[:id].to_i).to eq(@market1.id)
     expect(market[:type]).to eq("market")
     expect(market[:attributes][:name]).to eq(@market1.name)
@@ -99,14 +94,13 @@ describe "Market Search" do
   end
 
   it "searches for markets in a state" do
-    # body =  { state: "New Mexico" }
     get "/api/v0/markets/search?state=#{@market1.state}" 
-    # headers: @headers, params: JSON.generate(body)
-
+    
     expect(response).to be_successful
     expect(response.status).to eq(200)
 
     market = JSON.parse(response.body, symbolize_names: true)[:data].first
+    
     expect(market[:id].to_i).to eq(@market1.id)
     expect(market[:type]).to eq("market")
     expect(market[:attributes][:name]).to eq(@market1.name)
@@ -119,5 +113,31 @@ describe "Market Search" do
     expect(market[:attributes][:lon]).to eq(@market1.lon)
     expect(market[:attributes][:vendor_count]).to eq(5)
     
+  end
+
+  describe "sad paths" do
+    it "cannot find a market with only a city" do
+      get "/api/v0/markets/search?city=#{@market1.city}" 
+
+      expect(response).to_not be_successful
+      expect(response.status).to eq(422)
+
+      data = JSON.parse(response.body, symbolize_names: true)
+
+      expect(data[:errors]).to be_a(Array)
+      expect(data[:errors].first[:detail]).to eq("Invalid set of parameters. Please provide a valid set of parameters to perform a search with this endpoint.")
+    end
+
+    it "cannot find a market with only a city and name" do
+      get "/api/v0/markets/search?city=#{@market1.city}&name=#{@market1.name}" 
+      
+      expect(response).to_not be_successful
+      expect(response.status).to eq(422)
+
+      data = JSON.parse(response.body, symbolize_names: true)
+
+      expect(data[:errors]).to be_a(Array)
+      expect(data[:errors].first[:detail]).to eq("Invalid set of parameters. Please provide a valid set of parameters to perform a search with this endpoint.")
+    end
   end
 end
