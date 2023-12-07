@@ -5,13 +5,17 @@ Rails.application.routes.draw do
   # root "articles#index"
   namespace :api do
     namespace :v0 do
+      get "/markets/search", to: "market_search#index"
+      get "/markets/:id/nearest_atms", to: "nearest_atms#index"
+      
       resources :markets, only: [:index, :show] do
         resources :vendors, only: [:index]
       end
 
       delete "/market_vendors", to: "market_vendors#destroy"
       resources :vendors
-      resources :market_vendors 
+      resources :market_vendors
+
     end
   end
 end
