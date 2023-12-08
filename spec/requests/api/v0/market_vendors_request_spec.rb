@@ -76,6 +76,27 @@ describe "Market Vendors" do
   
       expect(data[:message]).to eq("Successfully added vendor to market")  
     end
+
+    it "will not create a market vendor if it already exists" do
+      market = create(:market)
+      market.vendors = create_list(:vendor, 1)
+      vendor = market.vendors.first
+
+      expect(market.vendors).to include(vendor)
+      market_vendor_params =  {
+        market_id: market.id,
+        vendor_id: vendor.id
+      }
+      headers = {"CONTENT_TYPE" => "application/json"}
+      post "/api/v0/market_vendors", headers: headers, params: JSON.generate(market_vendor: market_vendor_params)
+      expect(response).to_not be_successful
+      expect(MarketVendor.all.length).to eq(1)
+      
+      data = JSON.parse(response.body, symbolize_names: true)
+
+      expect(data[:errors]).to be_a(Array)
+      expect(data[:errors].first[:detail]).to eq("Validation failed: Market vendor asociation between market with market_id=#{market.id} and vendor_id=#{vendor.id} already exists")
+    end
   end
 
   describe "delete market vendors" do

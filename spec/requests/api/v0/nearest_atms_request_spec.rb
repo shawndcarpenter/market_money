@@ -27,9 +27,8 @@ describe "Nearest ATMs" do
 
     get "/api/v0/markets/#{market.id}/nearest_atms", headers: headers
     
-    # binding.pry
     expect(response).to be_successful
-    # expect(response.status).to eq(200)
+    expect(response.status).to eq(200)
 
     atms = JSON.parse(response.body, symbolize_names: true)[:data]
 
@@ -56,6 +55,38 @@ describe "Nearest ATMs" do
       expect(atm[:attributes]).to have_key(:distance)
       expect(atm[:attributes][:distance]).to be_a(Float)
     end
+  end
+
+  it "is in order of distance" do
+    market_params = ({
+              name: "Nob Hill Growers' Market",
+              street: "Lead & Morningside SE",
+              city: "Albuquerque",
+              county: "Bernalillo",
+              state: "New Mexico",
+              zip: "null",
+              lat: "35.077529",
+              lon: "-106.600449"
+          })
+    headers = {"CONTENT_TYPE" => "application/json"}
+
+    market = Market.create!(market_params)
+    atms_near_nob_hill_fixture = File.read("spec/fixtures/atms_near_nob_hill.json")
+    stub_request(:get, "https://api.tomtom.com/search/2/categorySearch/automatic_teller_machine.json?key=#{ENV["API_KEY"]}&lat=35.077529&lon=-106.600449&municipality=Albuquerque&streetName=Lead%20%26%20Morningside%20SE").
+    with(
+      headers: {
+     'Accept'=>'*/*',
+     'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+     'User-Agent'=>'Faraday v2.7.12'
+      }).
+    to_return(status: 200, body: atms_near_nob_hill_fixture, headers: {})
+
+    get "/api/v0/markets/#{market.id}/nearest_atms", headers: headers
+
+    atms = JSON.parse(response.body, symbolize_names: true)[:data]
+    expect(atms[0][:attributes][:distance] < atms[1][:attributes][:distance]).to be true
+    expect(atms[1][:attributes][:distance] < atms[2][:attributes][:distance]).to be true
+    expect(atms[2][:attributes][:distance] < atms[3][:attributes][:distance]).to be true
   end
 
   describe "sad path, invalid market id" do
