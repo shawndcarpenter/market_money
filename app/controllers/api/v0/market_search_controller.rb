@@ -14,21 +14,22 @@ class Api::V0::MarketSearchController < ApplicationController
   end
 
   def find_matching_market(params)
-    if params[:state].present? && params[:city].present? && params[:name].present?
-      searched_markets = Market.search_by_city_and_state_and_name(params[:city], params[:state], params[:name])
-      render json: MarketSerializer.new(searched_markets)
-    elsif params[:state].present? && params[:city].present?
-      searched_markets = Market.search_by_city_and_state(params[:city], params[:state])
-      render json: MarketSerializer.new(searched_markets)
-    elsif params[:state].present? && params[:name].present?
-      searched_markets = Market.search_by_state_and_name(params[:state], params[:name])
-      render json: MarketSerializer.new(searched_markets)
-    elsif params[:state].present?
-      searched_markets = Market.search_by_state(params[:state])
-      render json: MarketSerializer.new(searched_markets)
-    elsif params[:name].present? && !params[:city].present?
-      searched_markets = Market.search_by_name(params[:name])
-      render json: MarketSerializer.new(searched_markets)
+    searched_markets = []
+    params.each do |key, value|
+      if key == "state" && searched_markets == []
+        searched_markets = Market.where("lower(state) ilike ?", "%#{value.downcase}%")
+      elsif key == "state"
+        searched_markets = searched_markets.where("lower(state) ilike ?", "%#{value.downcase}%")
+      elsif key == "city" && searched_markets == []
+        searched_markets = Market.where("lower(city) ilike ?", "%#{value.downcase}%")
+      elsif key == "city"
+        searched_markets = searched_markets.where("lower(city) ilike ?", "%#{value.downcase}%")
+      elsif key == "name" && searched_markets == []
+        searched_markets = Market.where("lower(name) ilike ?", "%#{value.downcase}%")
+      elsif key == "name"
+        searched_markets = searched_markets.where("lower(name) ilike ?", "%#{value.downcase}%")
+      end
     end
+    render json: MarketSerializer.new(searched_markets), status: 200
   end
 end
