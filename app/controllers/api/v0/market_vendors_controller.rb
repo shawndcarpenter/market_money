@@ -4,11 +4,16 @@ class Api::V0::MarketVendorsController < ApplicationController
   def create
     params_market_id = params["market_vendor"][:market_id]
     params_vendor_id = params["market_vendor"][:vendor_id]
-    market_vendor = MarketVendor.new(market_id: params_market_id, vendor_id: params_vendor_id)
-    if market_vendor.save
-      success_response
+
+    if MarketVendor.where("market_id = #{params_market_id} and vendor_id = #{params_vendor_id}") != []
+      market_vendor_exists(params_market_id, params_vendor_id)
     else
-      no_market_vendor_response(params_market_id, params_vendor_id)
+      market_vendor = MarketVendor.new(market_id: params_market_id, vendor_id: params_vendor_id)
+      if market_vendor.save
+        success_response
+      else
+        no_market_vendor_response(params_market_id, params_vendor_id)
+      end
     end
   end
 
@@ -28,6 +33,13 @@ class Api::V0::MarketVendorsController < ApplicationController
   def invalid_response(exception)
     render json: ErrorSerializer.new(ErrorMessage.new(exception.message, 422))
     .serialize_json, status: :not_found
+  end
+
+  def market_vendor_exists(market_id, vendor_id)
+    render json: ErrorSerializer.new(
+      ErrorMessage.new(
+        "Validation failed: Market vendor asociation between market with market_id=#{market_id} and vendor_id=#{vendor_id} already exists", 422
+      )).serialize_json, status: 422
   end
 
   def no_market_vendor_response(market_id, vendor_id)
