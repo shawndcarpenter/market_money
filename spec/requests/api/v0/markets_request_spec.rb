@@ -54,9 +54,10 @@ describe "Markets API" do
   end
 
   it "can get one market by its id" do
-    id = create(:market).id
+    market = create(:market)
+    market.vendors = create_list(:vendor, 5)
 
-    get "/api/v0/markets/#{id}"
+    get "/api/v0/markets/#{market.id}"
 
     market = JSON.parse(response.body, symbolize_names: true)[:data]
 
@@ -96,6 +97,7 @@ describe "Markets API" do
       
     expect(market[:attributes]).to have_key(:vendor_count)
     expect(market[:attributes][:vendor_count]).to be_a(Integer)
+    expect(market[:attributes][:vendor_count]).to eq(5)
   end
 
   describe "sad paths" do
