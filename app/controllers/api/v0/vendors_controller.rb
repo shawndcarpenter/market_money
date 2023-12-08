@@ -23,13 +23,9 @@ class Api::V0::VendorsController < ApplicationController
   end
 
   def update
-    if vendor_params[:contact_name] == ""
-      vendor = Vendor.find(params[:id])
-      vendor.update!(contact_name: nil)
-      render json: VendorSerializer.new(Vendor.update(params[:id], vendor_params))
-    else
-      render json: VendorSerializer.new(Vendor.update(params[:id], vendor_params))
-    end
+    vendor = Vendor.find(params[:id])
+    invalid_params(vendor_params, vendor)
+    render json: VendorSerializer.new(Vendor.update(params[:id], vendor_params))
   end
 
   def destroy 
@@ -40,6 +36,32 @@ class Api::V0::VendorsController < ApplicationController
   end
 
   private
+  def invalid_params(vendor_params, vendor)
+    list_of_invalid_params = []
+    vendor_params.each do |key, value|
+      if value == ""
+        list_of_invalid_params << key
+      end
+    end
+    set_to_nil(list_of_invalid_params, vendor)
+  end
+
+  def set_to_nil(list_of_invalid_params, vendor)
+    list_of_invalid_params.each do |param|
+      if param == "contact_name"
+        vendor.update!(contact_name: nil)
+      elsif param == "name"
+        vendor.update!(name: nil)
+      elsif param == "contact_phone"
+        vendor.update!(contact_phone: nil)
+      elsif param == "description"
+        vendor.update!(description: nil)
+      elsif param == "credit_accepted"
+        vendor.update!(credit_accepted: nil)
+      end
+    end
+  end
+
   def not_found_response(exception)
     render json: ErrorSerializer.new(ErrorMessage.new(exception.message, 404))
     .serialize_json, status: :not_found

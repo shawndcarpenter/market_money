@@ -1,6 +1,5 @@
 class Api::V0::MarketSearchController < ApplicationController
   def index
-    # binding.pry
     if params[:state].present? && params[:city].present? && params[:name].present?
       searched_markets = Market.search_by_city_and_state_and_name(params[:city], params[:state], params[:name])
       render json: MarketSerializer.new(searched_markets)
