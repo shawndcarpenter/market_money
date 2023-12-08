@@ -1,5 +1,4 @@
 class AtmSerializer
-
   def self.format_atms(atms)
     { data:
       atms.map do |atm|
