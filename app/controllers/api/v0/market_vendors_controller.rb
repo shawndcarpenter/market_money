@@ -61,6 +61,6 @@ class Api::V0::MarketVendorsController < ApplicationController
   def success_response
       render json:  {
         "message": "Successfully added vendor to market"
-      }
+      }, status: 201
   end
 end

@@ -70,6 +70,7 @@ describe "Market Vendors" do
       headers = {"CONTENT_TYPE" => "application/json"}
       post "/api/v0/market_vendors", headers: headers, params: JSON.generate(market_vendor: market_vendor_params)
       expect(response).to be_successful
+      expect(response.status).to eq(201)
       expect(MarketVendor.all.length).to eq(1)
       
       data = JSON.parse(response.body, symbolize_names: true)
