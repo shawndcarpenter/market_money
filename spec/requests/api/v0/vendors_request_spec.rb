@@ -148,7 +148,7 @@ describe "Vendor API Request" do
         expect(data[:errors].first[:detail]).to eq("Couldn't find Vendor with 'id'=123123123123")
       end
 
-      it "gives an error when an update parameter is blank" do
+      it "gives an error when a contact name is blank" do
         patch "/api/v0/vendors/#{@vendor.id}",
         headers: headers, params: JSON.generate( {
           contact_name: "",
@@ -162,6 +162,70 @@ describe "Vendor API Request" do
 
         expect(data[:errors]).to be_an(Array)
         expect(data[:errors].first[:detail]).to eq("Validation failed: Contact name can't be blank")
+      end
+
+      it "gives an error when a contact phone is blank" do
+        patch "/api/v0/vendors/#{@vendor.id}",
+        headers: headers, params: JSON.generate( {
+          contact_phone: "",
+          credit_accepted: false
+        })
+ 
+        expect(response).to_not be_successful
+        expect(response.status).to eq(400)
+
+        data = JSON.parse(response.body, symbolize_names: true)
+
+        expect(data[:errors]).to be_an(Array)
+        expect(data[:errors].first[:detail]).to eq("Validation failed: Contact phone can't be blank")
+      end
+
+      it "gives an error when an update parameter is blank" do
+        patch "/api/v0/vendors/#{@vendor.id}",
+        headers: headers, params: JSON.generate( {
+          name: "",
+          credit_accepted: false
+        })
+ 
+        expect(response).to_not be_successful
+        expect(response.status).to eq(400)
+
+        data = JSON.parse(response.body, symbolize_names: true)
+
+        expect(data[:errors]).to be_an(Array)
+        expect(data[:errors].first[:detail]).to eq("Validation failed: Name can't be blank")
+      end
+
+      it "gives an error when an update parameter is blank" do
+        patch "/api/v0/vendors/#{@vendor.id}",
+        headers: headers, params: JSON.generate( {
+          description: "",
+          credit_accepted: false
+        })
+ 
+        expect(response).to_not be_successful
+        expect(response.status).to eq(400)
+
+        data = JSON.parse(response.body, symbolize_names: true)
+
+        expect(data[:errors]).to be_an(Array)
+        expect(data[:errors].first[:detail]).to eq("Validation failed: Description can't be blank")
+      end
+
+      it "gives an error when an update parameter is blank" do
+        patch "/api/v0/vendors/#{@vendor.id}",
+        headers: headers, params: JSON.generate( {
+          credit_accepted: "",
+          contact_name: "Linda"
+        })
+ 
+        expect(response).to_not be_successful
+        expect(response.status).to eq(400)
+
+        data = JSON.parse(response.body, symbolize_names: true)
+
+        expect(data[:errors]).to be_an(Array)
+        expect(data[:errors].first[:detail]).to eq("Validation failed: Credit accepted can't be blank")
       end
     end
   end

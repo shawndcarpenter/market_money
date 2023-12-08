@@ -3,7 +3,7 @@ class Atm
 
   def initialize(atm)
     @name = atm[:poi][:name]
-    @address = atm[:address][:streetNumber]
+    @address = "#{atm[:address][:streetNumber]} #{atm[:address][:streetName]}, #{atm[:address][:municipality]}, #{atm[:address][:countrySubdivision]} #{atm[:address][:postalCode]}"
     @lat = atm[:position][:lat]
     @lon = atm[:position][:lon]
     @distance = atm[:dist]

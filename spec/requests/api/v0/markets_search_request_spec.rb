@@ -10,7 +10,7 @@ describe "Market Search" do
   end
 
   it "searches for markets in a state and city" do
-    get "/api/v0/markets/search?city=#{@market1.city}&state=#{@market1.state}" 
+    get "/api/v0/markets/search?state=#{@market1.state}&city=#{@market1.city}" 
 
     expect(response).to be_successful
     expect(response.status).to eq(200)
