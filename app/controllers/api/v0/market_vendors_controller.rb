@@ -7,6 +7,8 @@ class Api::V0::MarketVendorsController < ApplicationController
 
     if MarketVendor.where("market_id = #{params_market_id} and vendor_id = #{params_vendor_id}") != []
       market_vendor_exists(params_market_id, params_vendor_id)
+    elsif Market.where("id = #{params_market_id}") == []
+      no_market_response
     else
       market_vendor = MarketVendor.new(market_id: params_market_id, vendor_id: params_vendor_id)
       if market_vendor.save
@@ -33,6 +35,13 @@ class Api::V0::MarketVendorsController < ApplicationController
   def invalid_response(exception)
     render json: ErrorSerializer.new(ErrorMessage.new(exception.message, 422))
     .serialize_json, status: :not_found
+  end
+
+  def no_market_response
+    render json: ErrorSerializer.new(
+      ErrorMessage.new(
+        "Validation failed: Market must exist", 404
+      )).serialize_json, status: 404
   end
 
   def market_vendor_exists(market_id, vendor_id)
